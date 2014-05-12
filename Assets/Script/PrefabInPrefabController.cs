@@ -8,14 +8,9 @@ using UnityEditor;
 [ExecuteInEditMode]
 public class PrefabInPrefabController : MonoBehaviour
 {
-	[ContextMenu("Re Register")]
 	void Start ()
 	{
-		foreach (var prefabInPrefab in GetComponents<PrefabInPrefab>())
-			prefabInPrefab.AddPrefabList ();
-
-		ClearPrefab ();
-		enabled = false;
+		CreatePrefab ();
 	}
 
 	public List<PrefabItem> registerPrefabList = new List<PrefabItem> ();
@@ -52,7 +47,7 @@ public class PrefabInPrefabController : MonoBehaviour
 
 #if UNITY_EDITOR
 
-	[ContextMenu("update prefab")]
+	[ContextMenu("プレハブの更新")]
 	void UpdatePrefab ()
 	{
 		GameObject temp = new GameObject ("temp");
@@ -79,8 +74,21 @@ public class PrefabInPrefabController : MonoBehaviour
 
 		DestroyImmediate (temp);
 	}
+#endif
 
-	[ContextMenu("Clean")]
+	[ContextMenu("プレハブ生成")]
+	void CreatePrefab ()
+	{
+		foreach (var prefabInPrefab in GetComponents<PrefabInPrefab>())
+			prefabInPrefab.AddPrefabList ();
+		
+		ClearPrefab ();
+		enabled = false;
+
+	}
+
+#if UNITY_EDITOR
+	[ContextMenu("不完全な参照を破棄")]
 	void ClearPrefab ()
 	{
 		var removePrefabList = new List<PrefabItem> ();
@@ -98,7 +106,7 @@ public class PrefabInPrefabController : MonoBehaviour
 		}
 	}
 
-	[ContextMenu("remove all registed prefab")]
+	[ContextMenu("子プレハブを破棄")]
 	void RemoveAllRegistedPrefab ()
 	{
 		var removePrefabList = new List<PrefabItem> (registerPrefabList);
@@ -106,6 +114,36 @@ public class PrefabInPrefabController : MonoBehaviour
 		foreach (var removePrefab in removePrefabList) {
 			DestroyImmediate (removePrefab.instancedObject);
 			registerPrefabList.Remove (removePrefab);
+		}
+	}
+
+	[ContextMenu("子のプレハブを登録")]
+	void RegisterAllChildPrefab ()
+	{
+		var childCount = transform.childCount;
+		var pip = new List<PrefabInPrefab> (GetComponents<PrefabInPrefab> ());
+		
+		for (int i=0; i<childCount; i++) {
+			var child = transform.GetChild (i);
+			var type = PrefabUtility.GetPrefabType (child);
+			
+			if (type == PrefabType.PrefabInstance) {
+				var root = (Transform)PrefabUtility.GetPrefabParent (child);
+				
+				if (pip.Find ((item) => item.prefab == root.gameObject) == null) {
+					
+					var prefabInPrefab = gameObject.AddComponent<PrefabInPrefab> ();
+					prefabInPrefab.prefab = root.gameObject;
+					
+					var prefabItem = new PrefabItem ()
+					{
+						prefabInPrefab = prefabInPrefab,
+						instancedObject = child.gameObject,
+					};
+					
+					registerPrefabList.Add (prefabItem);
+				}
+			}
 		}
 	}
 

@@ -3,6 +3,9 @@ UniNestedPrefab
 
 プレハブのネスト化する奴
 
+ベースアイディアはこちら  
+[prefab_in_prefab](https://github.com/kyubuns/prefab_in_prefab)
+
 ##使い方的な
 
 *  **PrefabInPrefab**コンポーネントをアタッチし、Prefabに出力したいプレハブを登録しておくと、インスタンス時に自動的にプレハブを生成する。

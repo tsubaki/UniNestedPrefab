@@ -3,11 +3,12 @@ using System.Collections;
 
 public class LoadPrefab : MonoBehaviour
 {
-	public GameObject obk;
+	public GameObject prefab;
 
 	void Start ()
 	{
-		GameObject.Instantiate (obk);
+		var item = (GameObject)GameObject.Instantiate (prefab);
+		item.transform.position = transform.position;
 	}
 
 }

@@ -8,11 +8,13 @@ using UnityEditor;
 [ExecuteInEditMode]
 public class PrefabInPrefabController : MonoBehaviour
 {
-
+	[ContextMenu("Re Register")]
 	void Start ()
 	{
 		foreach (var prefabInPrefab in GetComponents<PrefabInPrefab>())
 			prefabInPrefab.AddPrefabList ();
+
+		ClearPrefab ();
 		enabled = false;
 	}
 
@@ -49,6 +51,7 @@ public class PrefabInPrefabController : MonoBehaviour
 	}
 
 #if UNITY_EDITOR
+
 	[ContextMenu("update prefab")]
 	void UpdatePrefab ()
 	{
@@ -76,6 +79,36 @@ public class PrefabInPrefabController : MonoBehaviour
 
 		DestroyImmediate (temp);
 	}
+
+	[ContextMenu("Clean")]
+	void ClearPrefab ()
+	{
+		var removePrefabList = new List<PrefabItem> ();
+
+		foreach (var prefabInPrefab in registerPrefabList) {
+
+			if (prefabInPrefab.instancedObject == null || prefabInPrefab.prefabInPrefab == null) {
+				removePrefabList.Add (prefabInPrefab);
+			}
+		}
+
+		foreach (var removePrefab in removePrefabList) {
+			DestroyImmediate (removePrefab.instancedObject);
+			registerPrefabList.Remove (removePrefab);
+		}
+	}
+
+	[ContextMenu("remove all registed prefab")]
+	void RemoveAllRegistedPrefab ()
+	{
+		var removePrefabList = new List<PrefabItem> (registerPrefabList);
+
+		foreach (var removePrefab in removePrefabList) {
+			DestroyImmediate (removePrefab.instancedObject);
+			registerPrefabList.Remove (removePrefab);
+		}
+	}
+
 #endif
 
 	[System.Serializable]

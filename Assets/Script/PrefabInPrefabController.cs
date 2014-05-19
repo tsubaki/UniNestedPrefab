@@ -147,6 +147,12 @@ public class PrefabInPrefabController : MonoBehaviour
 		}
 	}
 
+	[ContextMenu("子のプレハブを登録してプレハブを更新")]
+	void RegisterAllChildPrefabAndUpdatePrefab ()
+	{
+		RegisterAllChildPrefab();
+		UpdatePrefab();
+	}
 #endif
 
 	[System.Serializable]
